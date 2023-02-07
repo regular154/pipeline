@@ -2,7 +2,7 @@ swagger: "2.0"
 info:
   description: "This is a sample API specification file based on the OpenAPI 2.0 specification."
   version: "1.0.0"
-  title: "API Marketplace yaml OAS2 Demo"
+  title: "test71744"
   contact:
     email: "dan.cazacu@signanthealth.com"
 host: "dummy-apispec.signanthealth.com"
