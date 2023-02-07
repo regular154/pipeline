@@ -1,111 +1,169 @@
+---
 swagger: "2.0"
 info:
-  description: "This is a sample API specification file based on the OpenAPI 2.0 specification."
-  version: "1.0.0"
-  title: "test71744"
-  contact:
-    email: "dan.cazacu@signanthealth.com"
-host: "dummy-apispec.signanthealth.com"
+  description: "EConsent Integration API's"
+  version: "1.0"
+  title: "test1747"
+host: "api-tcpluto.app.rd.crfhealth.com"
+basePath: "/tcintegrationfs/rest/v1"
 tags:
-- name: "quality"
-  description: "Quality related product"
-- name: "data"
-  description: "Data related product"
-x-SearchTags:
-  - name: Data
-x-Categories:
-  - Data
+- name: "document"
+  description: "Operations about sponsor documents"
+- name: "participant"
+  description: "Operations about participants"
+- name: "study"
+  description: "Operations about studies"
 schemes:
 - "https"
-- "http"
 paths:
-  /random/{type}:
+  /api/{sponsor}/documents:
     get:
       tags:
-      - "quality"
-      - "data"
-      summary: "Get random integer"
-      description: "Returns random integer between max and min specified as query parameters using the specified generator type"
-      operationId: "random"
+      - "document"
+      summary: "Get documents API"
+      description: "API for documents retrieval"
+      operationId: "getDocumentsDetails"
+      consumes:
+      - "application/json"
       produces:
-      - "application/xml"
       - "application/json"
       parameters:
-      - name: "max"
-        in: "query"
-        description: "Maximum number for the random interval"
-        required: true
-        type: "integer"
-        format: "int64"
-      - name: "min"
-        in: "query"
-        description: "Minimum number for the random interval"
-        required: true
-        type: "integer"
-        format: "int64"
-      - name: "type"
+      - name: "sponsor"
         in: "path"
-        description: >
-            "Generator type:
-             * `linear` - Linear Congruential Method
-             * `combined` - Combined Linear Congruential Generator
-             * `stream` - Random Number Streams"
+        description: "Sponsor to be fetched"
         required: true
         type: "string"
-        enum:
-          - "linear"
-          - "combined"
-          - "stream"
+        x-example: "AZ"
+      - name: "studyId"
+        in: "query"
+        description: "Study id for the given sponsor"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "siteId"
+        in: "query"
+        description: "Site id for the given sponsor and study"
+        required: true
+        type: "integer"
+        format: "int64"
       responses:
-        "200":
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/random"
-        "400":
-          description: "Invalid parameters supplied"
-        "500":
-          description: "Internal server error"
-  /random:
-    get:
+        200:
+          description: "Response ok"
+        400:
+          description: "Missing query parameters  or X-API-USER header/The study doesn’\
+            t exists/The study is inactive"
+        401:
+          description: "Bearer token invalid / expired or API call initiator not found\
+            \ or not allocated to the given sponsor / study / site."
+        404:
+          description: "Sponsor not found."
+  /api/{sponsor}/participants:
+    post:
       tags:
-      - "data"
-      summary: "Get random number"
-      description: "Returns random integer between 0 and 100 using stream random generator"
-      operationId: "quickrandom"
+      - "participant"
+      summary: "Create participant API"
+      description: "API for create participant with given sponsor"
+      operationId: "createParticipant"
+      consumes:
+      - "application/json"
       produces:
       - "application/json"
-      responses:
-        "200":
-          description: "successful operation"
-          schema:
-            type: "object"
-            required:
-            - "number"
-            properties:
-              number:
-                type: "integer"
-                description: "Generated number"
-                example : 10
-                format: "int64"
-        "500":
-          description: "Internal server error"
-definitions:
-  random:
-    type: "object"
-    required:
-    - "number"
-    properties:
-      number:
-        type: "integer"
-        description: "Generated number"
-        example : 10
-        format: "int64"
-      generatorType:
+      parameters:
+      - in: "body"
+        name: "data"
+        description: "Payload"
+        required: true
+        schema:
+          type: "object"
+      - name: "sponsor"
+        in: "path"
+        description: "Sponsor where participant has to be created"
+        required: true
         type: "string"
-        description: "Generator type used for this randomization"
-        enum:
-        - "linear"
-        - "combined"
-        - "stream"
-    xml:
-      name: "random"
+      responses:
+        201:
+          description: "Participant created"
+        400:
+          description: "Invalid payload parameters"
+        404:
+          description: "Bearer token invalid / expired or API call initiator not found\
+            \ or not allocated to the given sponsor / study / site."
+  /api/{sponsor}/participants/representation:
+    get:
+      tags:
+      - "participant"
+      summary: "Get Participant Representation"
+      description: "API for get Participant Representation"
+      operationId: "getRepresentation"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "sponsor"
+        in: "path"
+        description: "Sponsor where participant is created"
+        required: true
+        type: "string"
+      - name: "documentIds"
+        in: "query"
+        description: "Comma separated value list of document ids resulted after HCP\
+          \ selects the language and add / removes optional for selected documents\
+          \ if any."
+        required: true
+        type: "array"
+        items:
+          type: "integer"
+          format: "int64"
+        collectionFormat: "multi"
+      responses:
+        200:
+          description: "Response ok"
+        400:
+          description: "Missing query parameters  or X-API-USER header/The ids are\
+            \ from documents with different studies. Validation code will be DOCUMENTS_FROM_DIFFERENT_STUDIES/The\
+            \ ids are from documents with different sites. Validation code will be\
+            \ DOCUMENTS_FROM_DIFFERENT_SITES"
+        401:
+          description: "Bearer token invalid / expired or API call initiator not found\
+            \ or not allocated to the given sponsor / study / site."
+        403:
+          description: "The investigator have no access rights to at least one document\
+            \ from the document list."
+        404:
+          description: "Sponsor not found."
+  /api/{sponsor}/studies:
+    get:
+      tags:
+      - "study"
+      summary: "Get documents API"
+      description: "API for documents retrieval"
+      operationId: "getStudiesDetails"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "sponsor"
+        in: "path"
+        description: "Sponsor to be fetched"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Response ok"
+        400:
+          description: "Missing X-API-USER header"
+        401:
+          description: "Bearer token invalid / expired or API call initiator not found\
+            \ or not allocated to the given sponsor / study / site."
+        404:
+          description: "Sponsor not found."
+x-SearchTags:
+- name: "eConsent"
+- name: "Participant"
+- name: "Sponsors"
+- name: "Sites"
+x-Categories:
+- "Data"
+- "Services"
