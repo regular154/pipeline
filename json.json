@@ -1,8 +1,8 @@
 {
-    "swagger": "2.1",
+    "swagger": "2.0",
     "info": {
       "description": "This is a sample API specification file based on the OpenAPI 2.0 specification.",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "title": "API Marketplace json OAS2 Demo",
       "contact": {
         "email": "dan.cazacu@signanthealth.com"
