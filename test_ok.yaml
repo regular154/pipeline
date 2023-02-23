@@ -1,0 +1,127 @@
+swagger: "2.0"
+info:
+  description: "This is a sample API specification file based on the OpenAPI 2.0 specification."
+  version: "1.0.0"
+  title: "Test title"
+  contact:
+    email: "some.email@gmail.com"
+host: "dummy-apispec.domain.com"
+x-SearchTags:
+- name: Data
+- name: DTP
+- name: eCOA
+- name: eConsent
+- name: Exchange
+- name: Insights
+- name: Monitoring
+- name: Participant
+- name: Reporting
+- name: RTSM
+- name: Services
+- name: Sites
+- name: Sponsors
+- name: Telemedicine
+- name: Users
+x-Categories:
+- Data
+- Insights
+- Services
+tags:
+- name: "quality"
+  description: "Quality related product"
+- name: "data"
+  description: "Data related product"
+schemes:
+- "https"
+- "http"
+paths:
+  /random/{type}:
+    get:
+      tags:
+      - "quality"
+      - "data"
+      summary: "Get random integer"
+      description: "Returns random integer between max and min specified as query parameters using the specified generator type"
+      operationId: "random"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "max"
+        in: "query"
+        description: "Maximum number for the random interval"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "min"
+        in: "query"
+        description: "Minimum number for the random interval"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "type"
+        in: "path"
+        description: >
+            "Generator type:
+             * `linear` - Linear Congruential Method
+             * `combined` - Combined Linear Congruential Generator
+             * `stream` - Random Number Streams"
+        required: true
+        type: "string"
+        enum:
+          - "linear"
+          - "combined"
+          - "stream"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/random"
+        "400":
+          description: "Invalid parameters supplied"
+        "500":
+          description: "Internal server error"
+  /random:
+    get:
+      tags:
+      - "data"
+      summary: "Get random number"
+      description: "Returns random integer between 0 and 100 using stream random generator"
+      operationId: "quickrandom"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "object"
+            required:
+            - "number"
+            properties:
+              number:
+                type: "integer"
+                description: "Generated number"
+                example : 10
+                format: "int64"
+        "500":
+          description: "Internal server error"
+definitions:
+  random:
+    type: "object"
+    required:
+    - "number"
+    properties:
+      number:
+        type: "integer"
+        description: "Generated number"
+        example : 10
+        format: "int64"
+      generatorType:
+        type: "string"
+        description: "Generator type used for this randomization"
+        enum:
+        - "linear"
+        - "combined"
+        - "stream"
+    xml:
+      name: "random"
